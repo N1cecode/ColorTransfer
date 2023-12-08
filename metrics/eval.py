@@ -63,7 +63,6 @@ def calculate_metrics(nets, args, step, mode):
                 N = x_src.size(0)
                 x_src = x_src.to(device)
                 y_trg = torch.tensor([trg_idx] * N).to(device)
-                masks = nets.fan.get_heatmap(x_src) if args.w_hpf > 0 else None
 
                 # generate 10 outputs from the same input
                 group_of_images = []
@@ -82,7 +81,7 @@ def calculate_metrics(nets, args, step, mode):
                             x_ref = x_ref[:N]
                         s_trg = nets.style_encoder(x_ref, y_trg)
 
-                    x_fake = nets.generator(x_src, s_trg, masks=masks)
+                    x_fake = nets.generator(x_src, s_trg)
                     group_of_images.append(x_fake)
 
                     # save generated images to calculate FID later
