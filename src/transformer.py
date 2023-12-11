@@ -229,7 +229,7 @@ class PatchEmbed(nn.Module):
         else:
             self.norm = None
 
-    def forward(self, x):
+    def forward(self, x, s=None):
         B, C, H, W = x.shape
         # fixme look at relaxing size constraints
         assert H == self.img_size[0] and W == self.img_size[1], \
@@ -266,12 +266,25 @@ class PatchUnEmbed(nn.Module):
         self.in_chans = in_chans
         self.embed_dim = embed_dim
 
-    def forward(self, x):
+    def forward(self, x, s=None):
         x = x.transpose(1, 2).view(x.shape[0], self.embed_dim, self.img_size[0], self.img_size[1])  # b Ph*Pw c
         return x
 
 
 class AdaIN(nn.Module):
+    def __init__(self, style_dim, dim, act_layer=nn.GELU()):
+        super().__init__()
+        self.norm = nn.InstanceNorm2d(dim, affine=False)
+        self.fc = nn.Linear(style_dim, dim*2)
+        self.act = act_layer
+
+    def forward(self, x, s):
+        h = self.fc(s)
+        h = h.view(h.size(0), h.size(1), 1, 1)
+        gamma, beta = torch.chunk(h, chunks=2, dim=1)
+        return self.act((1 + gamma) * self.norm(x) + beta)
+
+class AdaIN1d(nn.Module):
     def __init__(self, style_dim, dim):
         super().__init__()
         self.dim = dim
@@ -317,7 +330,7 @@ class SwinTransformerBlock(nn.Module):
 
     def __init__(self, dim, input_resolution, num_heads, window_size=8, shift_size=0,
                  mlp_ratio=2., qkv_bias=True, qk_scale=None, drop=0., attn_drop=0., drop_path=0.,
-                 act_layer=nn.GELU, norm_layer=nn.InstanceNorm1d(96, affine=True)):
+                 act_layer=nn.GELU, norm_layer=nn.LayerNorm):
         super().__init__()
         self.dim = dim
         self.input_resolution = input_resolution
@@ -331,13 +344,13 @@ class SwinTransformerBlock(nn.Module):
             self.window_size = min(self.input_resolution)
         assert 0 <= self.shift_size < self.window_size, "shift_size must in 0-window_size"
 
-        self.norm1 = norm_layer
+        self.norm1 = norm_layer(dim)
         self.attn = WindowAttention(
             dim, window_size=to_2tuple(self.window_size), num_heads=num_heads,
             qkv_bias=qkv_bias, qk_scale=qk_scale, attn_drop=attn_drop, proj_drop=drop)
 
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
-        self.norm2 = norm_layer
+        self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = MLP(in_features=dim, hidden_features=mlp_hidden_dim, drop=drop)
 
@@ -372,14 +385,7 @@ class SwinTransformerBlock(nn.Module):
         assert L == H * W, "input feature has wrong size"
 
         shortcut = x
-        x = x.transpose(1, 2)
-        
-        if s is None:
-            x = self.norm1(x)
-        else:
-            x = self.norm1(x, s)
-        
-        x = x.transpose(1, 2)
+        x = self.norm1(x)
         x = x.view(B, H, W, C)
 
         # cyclic shift
@@ -408,14 +414,7 @@ class SwinTransformerBlock(nn.Module):
 
         # FFN
         x = shortcut + self.drop_path(x)
-        x = x.transpose(1, 2)
-        
-        if s is None:
-            x = self.norm2(x)
-        else:
-            x = self.norm2(x, s)
-        
-        x = x.transpose(1, 2)
+        x = self.norm2(x)
         x = x + self.drop_path(self.mlp(x))
 
         return x
