@@ -1,4 +1,4 @@
-from transformer import *
+from src.transformer import *
 
 class TransformerEncoder(nn.Module):
     """ A basic Swin Transformer layer for one stage.
