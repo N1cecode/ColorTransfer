@@ -113,7 +113,7 @@ class Downsample(nn.Module):
         self.down = nn.PixelUnshuffle(scale)
     
     def forward(self, x):
-        x = self.conv(x) + x
+        x = self.conv(x)
         x = self.down(x)
         return x
 
@@ -125,7 +125,7 @@ class Upsample(nn.Module):
         self.up = nn.PixelShuffle(scale)
     
     def forward(self, x):
-        x = self.conv(x) + x
+        x = self.conv(x)
         x = self.up(x)
         return x
 
