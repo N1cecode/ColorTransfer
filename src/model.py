@@ -49,7 +49,7 @@ class TransformerEncoder(nn.Module):
 
     def forward(self, x):
         for block in self.blocks:
-            x = block(x)
+            x = block(x) + x
         return x
     
 
@@ -102,7 +102,7 @@ class TransformerDecoder(nn.Module):
 
     def forward(self, x, s):
         for block in self.blocks:
-            x = block(x, s)
+            x = block(x, s) + x
         return x
 
 
@@ -113,7 +113,7 @@ class Downsample(nn.Module):
         self.down = nn.PixelUnshuffle(scale)
     
     def forward(self, x):
-        x = self.conv(x)
+        x = self.conv(x) + x
         x = self.down(x)
         return x
 
@@ -125,7 +125,7 @@ class Upsample(nn.Module):
         self.up = nn.PixelShuffle(scale)
     
     def forward(self, x):
-        x = self.conv(x)
+        x = self.conv(x) + x
         x = self.up(x)
         return x
 
@@ -142,7 +142,7 @@ class EncodeBLK(nn.Module):
             self.down = Downsample(scale=scale, in_dim=in_dim, out_dim=out_dim)
         
     def forward(self, x):
-        x = self.transformer(x)
+        x = self.transformer(x) + x
         if self.scale:
             x = self.down(x)
         return x
@@ -163,7 +163,7 @@ class DecodeBLK(nn.Module):
     def forward(self, x, s):
         if self.scale:
             x = self.up(x)
-        x = self.transformer(x, s)
+        x = self.transformer(x, s) + x
         return x
 
 
