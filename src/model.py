@@ -49,7 +49,7 @@ class TransformerEncoder(nn.Module):
 
     def forward(self, x):
         for block in self.blocks:
-            x = block(x) + x
+            x = block(x)
         return x
     
 
@@ -102,7 +102,7 @@ class TransformerDecoder(nn.Module):
 
     def forward(self, x, s):
         for block in self.blocks:
-            x = block(x, s) + x
+            x = block(x, s)
         return x
 
 
