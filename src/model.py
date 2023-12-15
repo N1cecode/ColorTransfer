@@ -109,8 +109,10 @@ class TransformerDecoder(nn.Module):
 class Downsample(nn.Module):
     def __init__(self, scale, in_dim, out_dim, input_resolution=None):
         super().__init__()
-        self.conv = nn.Conv2d(in_dim, out_dim // (scale**2), 3, 1, 1)
-        self.down = nn.PixelUnshuffle(scale)
+        # self.conv = nn.Conv2d(in_dim, out_dim // (scale**2), 3, 1, 1)
+        # self.down = nn.PixelUnshuffle(scale)
+        self.conv = nn.Conv2d(in_dim, out_dim, 3, 1, 1)
+        self.down = x = F.avg_pool2d(x, scale)
     
     def forward(self, x):
         x = self.conv(x)
@@ -121,8 +123,10 @@ class Downsample(nn.Module):
 class Upsample(nn.Module):
     def __init__(self, scale, in_dim, out_dim, input_resolution=None):
         super().__init__()
-        self.conv = nn.Conv2d(in_dim, (scale**2)*out_dim, 3, 1, 1)
-        self.up = nn.PixelShuffle(scale)
+        # self.conv = nn.Conv2d(in_dim, (scale**2)*out_dim, 3, 1, 1)
+        # self.up = nn.PixelShuffle(scale)
+        self.conv = nn.Conv2d(in_dim, out_dim, 3, 1, 1)
+        self.up = torch.nn.functional.interpolate(x, scale_factor=scale, mode='nearest')
     
     def forward(self, x):
         x = self.conv(x)

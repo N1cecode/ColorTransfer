@@ -22,7 +22,7 @@ class CheckpointIO(object):
             else:
                 outdict[name] = module.state_dict()
                         
-        torch.save(outdict, fname)
+        torch.save(outdict, str(step)+'_'+fname)
 
     def load(self, step):
         fname = self.fname_template.format(step)
