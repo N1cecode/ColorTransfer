@@ -7,7 +7,7 @@ import torch
 
 from src.data_loader import get_train_loader
 from src.data_loader import get_test_loader
-from src.solver import Solver
+from src.solver_cnn import Solver
 
 
 def str2bool(v):
