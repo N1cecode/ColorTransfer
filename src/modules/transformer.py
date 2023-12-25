@@ -336,6 +336,7 @@ class SwinTransformerBlock(nn.Module):
         self.input_resolution = input_resolution
         self.num_heads = num_heads
         self.window_size = window_size
+        print("  Layer",shift_size, input_resolution)
         self.shift_size = shift_size
         self.mlp_ratio = mlp_ratio
         if min(self.input_resolution) <= self.window_size:

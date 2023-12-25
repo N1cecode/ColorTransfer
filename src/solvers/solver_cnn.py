@@ -8,10 +8,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from src.model import build_model
-from src.checkpoint import CheckpointIO
-from src.data_loader import InputFetcher
-import src.utils as utils
+from src.models.model_cnn import build_model
+from src.utils.checkpoint import CheckpointIO
+from src.utils.data_loader import InputFetcher
+import src.utils.utils as utils
 from metrics.eval import calculate_metrics
 
 

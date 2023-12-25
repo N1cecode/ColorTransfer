@@ -18,8 +18,8 @@ import torch
 
 from metrics.fid import calculate_fid_given_paths
 from metrics.lpips import calculate_lpips_given_images
-from src.data_loader import get_eval_loader
-from src import utils
+from src.utils.data_loader import get_eval_loader
+from src.utils import utils
 
 
 @torch.no_grad()

@@ -5,9 +5,8 @@ from munch import Munch
 from torch.backends import cudnn
 import torch
 
-from src.data_loader import get_train_loader
-from src.data_loader import get_test_loader
-from src.solver_cnn import Solver
+from src.utils.data_loader import get_train_loader
+from src.utils.data_loader import get_test_loader
 
 
 def str2bool(v):
@@ -64,7 +63,7 @@ def main(args):
     elif args.mode == 'eval':
         solver.evaluate()
     elif args.mode == 'align':
-        from src.wing import align_faces
+        from modules.wing import align_faces
         align_faces(args, args.inp_dir, args.out_dir)
     else:
         raise NotImplementedError
@@ -167,6 +166,21 @@ if __name__ == '__main__':
     parser.add_argument('--sample_every', type=int, default=5000)
     parser.add_argument('--save_every', type=int, default=10000)
     parser.add_argument('--eval_every', type=int, default=50000)
+    
+    # model type
+    parser.add_argument('--model_type', type=str, required=True,
+                        choices=['cnn', 'trans', 'mixed', 'other'])
+    
 
     args = parser.parse_args()
+    
+    if args.model_type == 'cnn':
+        from src.solvers.solver_cnn import Solver
+    elif args.model_type == 'trans':
+        from src.solvers.solver_trans import Solver
+    elif args.model_type == 'mixed':
+        from src.solvers.solver_mixed import Solver
+    else:
+        pass
+    
     main(args)

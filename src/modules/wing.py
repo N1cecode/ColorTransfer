@@ -395,7 +395,7 @@ def align_faces(args, input_dir, output_dir):
     import os
     from torchvision import transforms
     from PIL import Image
-    from src.utils import save_image
+    from utils.utils import save_image
 
     aligner = FaceAligner(args.wing_path, args.lm_path, args.img_size)
     transform = transforms.Compose([
