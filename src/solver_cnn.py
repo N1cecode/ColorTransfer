@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from src.model import build_model
+from src.model_cnn import build_model
 from src.checkpoint import CheckpointIO
 from src.data_loader import InputFetcher
 import src.utils as utils
