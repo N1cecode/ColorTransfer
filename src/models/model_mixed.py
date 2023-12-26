@@ -64,7 +64,7 @@ class SwinBlk(nn.Module):
     
     def forward(self, x):
         x = self.patch_embed(x)
-        x = self.layers(x)
+        x = self.layers(x) + x
         x = self.patch_unembed(x)
         return x
 
