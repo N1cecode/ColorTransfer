@@ -163,12 +163,12 @@ class Generator(nn.Module):
         x = self.from_rgb(x)
         cache = {}
         for block in self.encode:
-            if (x.size(2) in [32, 64, 128]):
+            if (x.size(2) in [32, 64, 128, 256]):
                 cache[x.size(2)] = x
             x = block(x)
         for block in self.decode:
             x = block(x, s)
-            if (x.size(2) in [32, 64, 128]):
+            if (x.size(2) in [32, 64, 128, 256]):
                 x = x + self.hpf(cache[x.size(2)])
         return self.to_rgb(x)
 
