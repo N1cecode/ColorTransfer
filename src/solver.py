@@ -8,7 +8,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from src.models.model_trans import build_model
 from src.utils.checkpoint import CheckpointIO
 from src.utils.data_loader import InputFetcher
 import src.utils.utils as utils
@@ -18,6 +17,16 @@ from metrics.eval import calculate_metrics
 class Solver(nn.Module):
     def __init__(self, args):
         super().__init__()
+        
+        if args.model_type == 'cnn':
+            from src.models.model_cnn import build_model
+        elif args.model_type == 'trans':
+            from src.models.model_trans import build_model
+        elif args.model_type == 'mixed':
+            from src.models.model_mixed import build_model
+        else:
+            raise NotImplementedError
+        
         self.args = args
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -41,11 +50,11 @@ class Solver(nn.Module):
                     weight_decay=args.weight_decay)
 
             self.ckptios = [
-                CheckpointIO(ospj(args.checkpoint_dir, 'nets.ckpt'), data_parallel=True, **self.nets),
-                CheckpointIO(ospj(args.checkpoint_dir, 'nets_ema.ckpt'), data_parallel=True, **self.nets_ema),
-                CheckpointIO(ospj(args.checkpoint_dir, 'optims.ckpt'), **self.optims)]
+                CheckpointIO(ospj(args.checkpoint_dir, 'nets'), data_parallel=True, **self.nets),
+                CheckpointIO(ospj(args.checkpoint_dir, 'nets_ema'), data_parallel=True, **self.nets_ema),
+                CheckpointIO(ospj(args.checkpoint_dir, 'optims'), **self.optims)]
         else:
-            self.ckptios = [CheckpointIO(ospj(args.checkpoint_dir, 'nets_ema.ckpt'), data_parallel=True, **self.nets_ema)]
+            self.ckptios = [CheckpointIO(ospj(args.checkpoint_dir, 'nets_ema'), data_parallel=True, **self.nets_ema)]
 
         self.to(self.device)
         for name, network in self.named_children():

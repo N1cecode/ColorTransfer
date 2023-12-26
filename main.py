@@ -8,6 +8,7 @@ import torch
 from src.utils.data_loader import get_train_loader
 from src.utils.data_loader import get_test_loader
 
+from src.solver import Solver
 
 def str2bool(v):
     return v.lower() in ('true')
@@ -173,14 +174,5 @@ if __name__ == '__main__':
     
 
     args = parser.parse_args()
-    
-    if args.model_type == 'cnn':
-        from src.solvers.solver_cnn import Solver
-    elif args.model_type == 'trans':
-        from src.solvers.solver_trans import Solver
-    elif args.model_type == 'mixed':
-        from src.solvers.solver_mixed import Solver
-    else:
-        pass
     
     main(args)
