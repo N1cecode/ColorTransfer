@@ -140,8 +140,8 @@ class AdainResBlk(nn.Module):
 
     def _build_weights(self, dim_in, dim_out, style_dim=64):
         self.conv1 = nn.Conv2d(dim_in, dim_out, 3, 1, 1)
-        # self.conv2 = nn.Conv2d(dim_out, dim_out, 3, 1, 1)
-        self.conv2 = SwinBlk(dim=dim_out, input_size=self.input_size, patch_size=1, window_size=4)
+        self.conv2 = nn.Conv2d(dim_out, dim_out, 3, 1, 1)
+        # self.conv2 = SwinBlk(dim=dim_out, input_size=self.input_size, patch_size=1, window_size=4)
         self.norm1 = AdaIN(style_dim, dim_in)
         self.norm2 = AdaIN(style_dim, dim_out)
         if self.learned_sc:
